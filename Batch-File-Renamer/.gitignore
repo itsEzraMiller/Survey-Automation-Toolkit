@@ -1,0 +1,9 @@
+# Ignore everything in the sample_files folder
+sample_files/*
+
+# ...except the .gitkeep file
+!sample_files/.gitkeep
+
+# Ignore Python cache
+__pycache__/
+*.pyc
