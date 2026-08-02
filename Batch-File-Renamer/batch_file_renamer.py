@@ -10,11 +10,15 @@ if not folder.exists() or not folder.is_dir():
     quit()
 
 # Get every file, ignoring hidden files
+allowed_extensions = [".jpg", ".jpeg", ".png", ".mp4"]
+
 files = sorted(
     [
         file
         for file in folder.iterdir()
-        if file.is_file() and not file.name.startswith(".")
+        if file.is_file()
+        and not file.name.startswith(".")
+        and file.suffix.lower() in allowed_extensions
     ]
 )
 
