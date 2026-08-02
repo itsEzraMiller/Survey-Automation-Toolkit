@@ -1,8 +1,22 @@
 from pathlib import Path
+import tkinter as tk
+from tkinter import filedialog
 
-# Ask the user for the folder containing the files
-folder_path = input("Enter the folder path: ").strip()
+# Hide the empty tkinter window
+root = tk.Tk()
+root.withdraw()
+
+# Ask the user to choose a folder
+folder_path = filedialog.askdirectory(
+    title="Select the folder containing your photos"
+)
+
+# Convert the chosen folder into a Path object
 folder = Path(folder_path)
+
+if not folder_path:
+    print("\nNo folder selected.")
+    quit()
 
 # Check that the folder exists
 if not folder.exists() or not folder.is_dir():
