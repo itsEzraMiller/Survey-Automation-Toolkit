@@ -1,46 +1,59 @@
 from pathlib import Path
 
-# Find the folder containing this script
-script_folder = Path(__file__).parent
+# Ask the user for the folder containing the files
+folder_path = input("Enter the folder path: ").strip()
+folder = Path(folder_path)
 
-# Locate the sample_files folder
-folder = script_folder / "sample_files"
+# Check that the folder exists
+if not folder.exists() or not folder.is_dir():
+    print("\nError: Folder not found.")
+    quit()
 
-# Get every item inside the folder
-files = list(folder.iterdir())
-
-# Remove hidden files
+# Get every file, ignoring hidden files
 files = sorted(
-    [file for file in files if not file.name.startswith(".")]
+    [
+        file
+        for file in folder.iterdir()
+        if file.is_file() and not file.name.startswith(".")
+    ]
 )
 
-print(f"Found {len(files)} files.\n")
+print(f"\nFound {len(files)} files.\n")
 
-# Ask the user for a filename prefix
-prefix = input("Enter a filename prefix: ")
+if len(files) == 0:
+    print("No files found.")
+    quit()
 
-print("\nFiles will be renamed as:\n")
+# Ask for filename prefix
+prefix = input("Enter filename prefix: ").strip()
 
-# Show a preview
+print("\nPreview:\n")
+
+new_paths = []
+
 for i, file in enumerate(files, start=1):
+
     extension = file.suffix
     new_name = f"{prefix}_{i:03}{extension}"
+    new_path = folder / new_name
+
+    # Check if destination already exists
+    if new_path.exists():
+        print(f"ERROR: {new_name} already exists.")
+        quit()
+
+    new_paths.append((file, new_path))
+
     print(f"{file.name}  →  {new_name}")
 
-# Ask for confirmation
 confirm = input("\nRename these files? (y/n): ")
 
-if confirm.lower() == "y":
+if confirm.lower() not in ["y", "yes"]:
+    print("\nCancelled.")
+    quit()
 
-    for i, file in enumerate(files, start=1):
-        extension = file.suffix
-        new_name = f"{prefix}_{i:03}{extension}"
+# Rename everything
+for old_file, new_file in new_paths:
+    old_file.rename(new_file)
 
-        new_path = folder / new_name
-
-        file.rename(new_path)
-
-    print("\nDone!")
-
-else:
-    print("\nNo files were renamed.")
+print("\nDone!")
