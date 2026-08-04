@@ -1,6 +1,10 @@
 # Ignore everything in the sample_files folder
 sample_files/*
 
+build/
+dist/
+*.spec
+
 # ...except the .gitkeep file
 !sample_files/.gitkeep
 
