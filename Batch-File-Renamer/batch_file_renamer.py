@@ -1,3 +1,5 @@
+import sys
+import re
 from pathlib import Path
 import tkinter as tk
 from tkinter import filedialog
@@ -28,7 +30,7 @@ folder_path = filedialog.askdirectory(
 
 if not folder_path:
     print("No folder selected. Program cancelled.")
-    quit()
+    sys.exit()
 
 folder = Path(folder_path)
 
@@ -59,7 +61,7 @@ print(f"Found {len(files)} supported files.\n")
 if len(files) == 0:
     print("No supported photos or videos were found.")
     print("Supported file types: JPG, JPEG, PNG and MP4.")
-    quit()
+    sys.exit()
 
 
 # -----------------------------
@@ -70,7 +72,10 @@ prefix = input("Enter filename prefix: ").strip()
 
 if not prefix:
     print("No prefix entered. Program cancelled.")
-    quit()
+    sys.exit()
+
+# Remove characters that aren't safe in filenames on Windows/Mac/Linux
+prefix = re.sub(r'[<>:"/\\|?*]', "_", prefix)
 
 
 # -----------------------------
@@ -92,7 +97,7 @@ for i, file in enumerate(files, start=1):
     if new_path.exists():
         print(f"\nERROR: {new_name} already exists.")
         print("No files have been renamed.")
-        quit()
+        sys.exit()
 
     new_paths.append((file, new_path))
 
@@ -107,7 +112,7 @@ confirm = input("\nRename these files? (y/n): ")
 
 if confirm.lower() not in ["y", "yes"]:
     print("\nCancelled. No files were changed.")
-    quit()
+    sys.exit()
 
 
 # -----------------------------
@@ -117,12 +122,18 @@ if confirm.lower() not in ["y", "yes"]:
 print("\nRenaming files...")
 
 total_files = len(new_paths)
+renamed_count = 0
+failed = []
 
 for i, (old_file, new_file) in enumerate(new_paths, start=1):
 
-    old_file.rename(new_file)
-
-    print(f"Renaming file {i} of {total_files}...")
+    try:
+        old_file.rename(new_file)
+        renamed_count += 1
+        print(f"Renaming file {i} of {total_files}...")
+    except OSError as e:
+        failed.append((old_file.name, str(e)))
+        print(f"FAILED: {old_file.name} — {e}")
 
 
 # -----------------------------
@@ -130,5 +141,10 @@ for i, (old_file, new_file) in enumerate(new_paths, start=1):
 # -----------------------------
 
 print("\n" + "=" * 45)
-print(f"Successfully renamed {total_files} files.")
+print(f"Successfully renamed {renamed_count} of {total_files} files.")
 print("=" * 45)
+
+if failed:
+    print(f"\n{len(failed)} file(s) could not be renamed:")
+    for name, err in failed:
+        print(f"  - {name}: {err}")
