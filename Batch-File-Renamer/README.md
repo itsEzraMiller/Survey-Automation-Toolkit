@@ -118,3 +118,13 @@ This project uses:
 This project was created as a practical automation tool for working with large numbers of photos and videos.
 
 It was also designed to develop Python skills relevant to GIS, surveying and data automation.
+
+## Screenshots
+
+### Selecting a folder
+
+![Folder selection](screenshots/folder-selection.png)
+
+### Previewing changes
+
+![Rename preview](screenshots/preview.png)
